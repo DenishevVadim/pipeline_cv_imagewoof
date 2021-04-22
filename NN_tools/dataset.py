@@ -67,3 +67,8 @@ class CustomDataset(Dataset):
             image = np.array(image)
             image = self.transform(image=image)["image"]
         return image, label
+
+def get_dataset(filepath, transform, batch_size, shuffle = False):
+    folder = torchvision.datasets.ImageFolder(filepath)
+    dataset = CustomDataset(folder = folder, transform = transform)
+    return DataLoader(dataset, batch_size, shuffle)
