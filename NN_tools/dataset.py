@@ -15,8 +15,10 @@ from torch import optim
 import matplotlib
 import matplotlib.pyplot as plt
 import os
+from os import listdir
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
+import cv2
 
 
 def get_train_transforms():
@@ -54,21 +56,36 @@ def get_val_transforms():
     )
 
 class CustomDataset(Dataset):
-    def __init__(self, folder, transform=None):
-        self.folder = folder
+    def __init__(self, folder, transform=None, is_labeled = True):
         self.transform = transform
+        self.is_labeled = is_labeled
+        self.folder = folder                        # if labeled, here labels and pil.images, else - just path
+        if not self.is_labeled:
+            self.image_list = listdir(folder)       # list name images in folder
 
     def __len__(self):
-        return len(self.folder)
+        if self.is_labeled:
+            return len(self.folder)                 #len for ImageFolder
+        else:
+            return len(self.image_list)             #len for unlabeled data
 
     def __getitem__(self, idx):
-        image, label = self.folder[idx]
-        if self.transform is not None:
+        if self.is_labeled:
+            image, label = self.folder[idx]
             image = np.array(image)
             image = self.transform(image=image)["image"]
-        return image, label
+            return image, label
+        else:
+            image = cv2.imread(self.folder + '/' + self.image_list[idx])
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            image = self.transform(image=image)["image"]
+            return image
 
-def get_dataset(filepath, transform, batch_size, shuffle = False):
-    folder = torchvision.datasets.ImageFolder(filepath)
-    dataset = CustomDataset(folder = folder, transform = transform)
-    return DataLoader(dataset, batch_size, shuffle)
+def get_dataset(filepath, transform, batch_size, shuffle = False, is_labeled = True):
+    if not is_labeled:
+        dataloader = CustomDataset(folder=filepath, transform=transform, is_labeled=is_labeled)
+    else:
+        folder = torchvision.datasets.ImageFolder(filepath)
+        dataset = CustomDataset(folder = folder, transform = transform)
+        dataloader = DataLoader(dataset, batch_size, shuffle)
+    return dataloader
