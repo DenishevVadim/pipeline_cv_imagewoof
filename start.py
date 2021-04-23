@@ -7,7 +7,8 @@ warnings.filterwarnings("ignore")
 
 
 p = argparse.ArgumentParser()
-p.add_argument("-folderpath", "-fp", type=str, help="path to folder with images", required=True)
+#p.add_argument("-folderpath", "-fp", type=str, help="path to folder with images", required=True)
+p.add_argument("-folderpath", "-fp", type=str, help="path to folder with images", required=False, default='/home/vadim/Downloads/imagewoof2-160/train/n02086240')
 p.add_argument("-mode", "-m", choices=["train", "predict"], default="predict")
 p.add_argument("-modelpath", "-mp", type=str, help="path to model", default="", metavar="")
 p.add_argument("-outputpath", "-op", type=str, help="path to output for predict", default="", metavar="")
@@ -42,11 +43,9 @@ if args.mode == 'train':
     torch.save(model, 'model_zip')
 else:
     custom_dataset = CustomDataset(args.folderpath, transform=get_val_transforms(), is_labeled = False)
-    test_dl = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=args.batchsize, shuffle=False)
+    test_dl = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=15, shuffle=False)
     device = torch.device("cuda" if torch.cuda.is_available()
                           else "cpu")
     model = Net(3, 10)
     model.to(device);
-    names, preds = get_predict(model, device, test_dl)
-    #next(iter(test_dl))
-    #get_predict(model, device, test_dl)
+    test = get_predict(model, device, test_dl)

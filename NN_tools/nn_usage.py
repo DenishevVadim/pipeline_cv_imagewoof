@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 import torch
 import torchvision
 import tarfile
@@ -77,15 +78,22 @@ def fit_model(model, optimizer, scheduler, device, train_dl, val_dl, epochs, gra
 
 
 def get_predict(model, device, test_dl):
-    name_arr = []
-    preds_arr = []
+    classes = ['Australian terrier', 'Border terrier', 'Samoyed', 'Beagle', 'Shih-Tzu', 'English foxhound',
+               'Rhodesian ridgeback', 'Dingo', 'Golden retriever', 'Old English sheepdog']
+
     model.eval()
+    name_arr = []
+    pred_arr = []
+    preds_arr = []
     #test_dl.dataset.__len__())
     for x, name in test_dl:
         x = x.to(device)
         out_class = model(x)
-        _, preds = torch.max(out_class, dim=1)
-    name_arr.append(name)
-    preds_arr.append(preds)
-    return name_arr, preds_arr
+        preds, pred = torch.max(out_class, dim=1)
+        preds, pred = preds.detach().numpy(), pred.detach().numpy()
+        name_arr = np.concatenate((name_arr, name), axis=0)
+        pred = list(map(lambda x: classes[x], pred))
+        pred_arr = np.concatenate((pred_arr, pred), axis=0)
+        preds_arr = np.concatenate((preds_arr, preds), axis=0)
 
+    return pd.DataFrame(data = np.array((name_arr, pred_arr, preds_arr)).T, columns=["name","class","output"])
