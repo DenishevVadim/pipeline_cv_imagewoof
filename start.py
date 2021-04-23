@@ -23,21 +23,20 @@ classes = ['Australian terrier', 'Border terrier', 'Samoyed', 'Beagle', 'Shih-Tz
 
 if args.mode == 'train':
     train_dl = get_dataset(args.folderpath + '/train', transform=get_train_transforms(),
-                           batch_size=args.batch_size, shuffle=True)
+                           batch_size=args.batchsize, shuffle=True)
     val_dl = get_dataset(args.folderpath + '/val', transform=get_val_transforms(),
-                         batch_size=args.batch_size, shuffle=False)
+                         batch_size=args.batchsize, shuffle=False)
     device = torch.device("cuda" if torch.cuda.is_available()
                           else "cpu")
     model = Net(3, 10)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.max_lr, weight_decay=args.weight_decay)
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, args.max_lr, epochs=15,
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, args.max_lr, epochs=args.epochs,
                                                     steps_per_epoch=len(train_dl))
     model.to(device);
 
-    model, loss = fit_model(model, optimizer, scheduler, train_dl=train_dl, val_dl=val_dl, epochs=epochs,
+    model, loss = fit_model(model, optimizer, scheduler, device, train_dl=train_dl, val_dl=val_dl, epochs=args.epochs,
                             grad_clip=args.grad_clip)
     print(loss)
     torch.save(model.state_dict(), 'model_dict')
     torch.save(model, 'model_zip')
-else:
