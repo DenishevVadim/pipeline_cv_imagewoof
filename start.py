@@ -1,6 +1,8 @@
 import warnings
 import argparse
-
+from NN_tools.dataset import *
+from NN_tools.nn_usage import *
+from NN_tools.neural_nation import *
 warnings.filterwarnings("ignore")
 
 
@@ -14,4 +16,28 @@ p.add_argument("-gradclip", "-gc", type=float, help="grad clip", default=0.1, me
 p.add_argument("-weightdecay", "-wd", type=float, help="weight decay", default=1e-4, metavar=1e-4)
 p.add_argument("-epochs", "-e", type=int, help="number epochs", default=20, metavar=20)
 p.add_argument("-batchsize", "-bs", type=int, help="batchsize", default=48, metavar=48)
-print(p.parse_args().mode)
+args = p.parse_args()
+
+classes = ['Australian terrier', 'Border terrier', 'Samoyed', 'Beagle', 'Shih-Tzu', 'English foxhound',
+               'Rhodesian ridgeback', 'Dingo', 'Golden retriever', 'Old English sheepdog']
+
+if args.mode == 'train':
+    train_dl = get_dataset(args.folderpath + '/train', transform=get_train_transforms(),
+                           batch_size=args.batch_size, shuffle=True)
+    val_dl = get_dataset(args.folderpath + '/val', transform=get_val_transforms(),
+                         batch_size=args.batch_size, shuffle=False)
+    device = torch.device("cuda" if torch.cuda.is_available()
+                          else "cpu")
+    model = Net(3, 10)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(model.parameters(), lr=args.max_lr, weight_decay=args.weight_decay)
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, args.max_lr, epochs=15,
+                                                    steps_per_epoch=len(train_dl))
+    model.to(device);
+
+    model, loss = fit_model(model, optimizer, scheduler, train_dl=train_dl, val_dl=val_dl, epochs=epochs,
+                            grad_clip=args.grad_clip)
+    print(loss)
+    torch.save(model.state_dict(), 'model_dict')
+    torch.save(model, 'model_zip')
+else:
