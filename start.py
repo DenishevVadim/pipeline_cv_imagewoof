@@ -39,14 +39,14 @@ if args.mode == 'train':
     model, loss = fit_model(model, optimizer, scheduler, device, train_dl=train_dl, val_dl=val_dl, epochs=args.epochs,
                             grad_clip=args.grad_clip)
     print(loss)
-    torch.save(model.state_dict(), 'model_dict')
-    torch.save(model, 'model_zip')
+    torch.save(model.state_dict(), 'model_dict.pt')
 else:
     custom_dataset = CustomDataset(args.folderpath, transform=get_val_transforms(), is_labeled = False)
     test_dl = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=15, shuffle=False)
     device = torch.device("cuda" if torch.cuda.is_available()
                           else "cpu")
     model = Net(3, 10)
+    model.load_state_dict(torch.load(f"data/{args.modelname}.pt", map_location=device))
     model.to(device);
     output = get_predict(model, device, test_dl)
     output.to_json(f"data/{args.outputname}.json")
