@@ -16,7 +16,7 @@ p.add_argument("-maxlr", "-mlr", type=float, help="max learning rate", default=0
 p.add_argument("-gradclip", "-gc", type=float, help="grad clip", default=0.1, metavar=0.1)
 p.add_argument("-weightdecay", "-wd", type=float, help="weight decay", default=1e-4, metavar=1e-4)
 p.add_argument("-epochs", "-e", type=int, help="number epochs", default=20, metavar=20)
-p.add_argument("-batchsize", "-bs", type=int, help="batchsize", default=48, metavar=48)
+p.add_argument("-batchsize", "-bs", type=int, help="batchsize", default=16, metavar=16)
 args = p.parse_args()
 
 classes = ['Australian terrier', 'Border terrier', 'Samoyed', 'Beagle', 'Shih-Tzu', 'English foxhound',
@@ -42,7 +42,7 @@ if args.mode == 'train':
     torch.save(model.state_dict(), 'model_dict.pt')
 else:
     custom_dataset = CustomDataset(args.folderpath, transform=get_val_transforms(), is_labeled = False)
-    test_dl = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=15, shuffle=False)
+    test_dl = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=args.batchsize, shuffle=False)
     device = torch.device("cuda" if torch.cuda.is_available()
                           else "cpu")
     model = Net(3, 10)
