@@ -1,20 +1,6 @@
-import os
-import torch
 import torchvision
-import tarfile
-import torch.nn as nn
 import numpy as np
-import torch.nn.functional as F
-import time
-from torch.utils.data import DataLoader, Dataset, random_split
-from torchvision.datasets.utils import download_url
-from torchvision.datasets import ImageFolder
-from torchvision.utils import make_grid
-from torchvision import transforms
-from torch import optim
-import matplotlib
-import matplotlib.pyplot as plt
-import os
+from torch.utils.data import DataLoader, Dataset
 from os import listdir
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2

@@ -1,23 +1,9 @@
-import os
 import pandas as pd
 import torch
-import torchvision
-import tarfile
 import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 import time
-from torch.utils.data import DataLoader, Dataset, random_split
-from torchvision.datasets.utils import download_url
-from torchvision.datasets import ImageFolder
-from torchvision.utils import make_grid
-from torchvision import transforms
-from torch import optim
-import matplotlib
-import matplotlib.pyplot as plt
-import os
-import albumentations as A
-from albumentations.pytorch.transforms import ToTensorV2
 
 
 def train_metrics(model, optimizer, scheduler, device, train_dl, epoch, grad_clip=None):
