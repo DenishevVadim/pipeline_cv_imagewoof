@@ -7,8 +7,7 @@ warnings.filterwarnings("ignore")
 
 
 p = argparse.ArgumentParser()
-#p.add_argument("-folderpath", "-fp", type=str, help="path to folder with images", required=True)
-p.add_argument("-folderpath", "-fp", type=str, help="path to folder with images", required=False, default='/home/vadim/Downloads/imagewoof2-160/train/n02086240')
+p.add_argument("-folderpath", "-fp", type=str, help="path to folder with images", required=True)
 p.add_argument("-mode", "-m", choices=["train", "predict"], default="predict")
 p.add_argument("-modelname", "-mn", type=str, help="name to model, default basemodel", default="basemodel", metavar="basemodel")
 p.add_argument("-outputname", "-on", type=str, help="name to output for predict /data/name.json", default="default", metavar="default")
@@ -32,12 +31,12 @@ if args.mode == 'train':
     model = Net(3, 10)
     model.to(device);
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=args.max_lr, weight_decay=args.weight_decay)
+    optimizer = optim.SGD(model.parameters(), lr=args.maxlr, weight_decay=args.weightdecay)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, args.max_lr, epochs=args.epochs,
                                                     steps_per_epoch=len(train_dl))
 
     model, loss = fit_model(model, optimizer, scheduler, device, train_dl=train_dl, val_dl=val_dl, epochs=args.epochs,
-                            grad_clip=args.grad_clip)
+                            grad_clip=args.gradclip)
     print(loss)
     torch.save(model.state_dict(), 'model_dict.pt')
 else:

@@ -69,9 +69,9 @@ def fit_model(model, optimizer, scheduler, device, train_dl, val_dl, epochs, gra
         torch.cuda.empty_cache()
         sum_loss_val, acc, model, val_time = val_metrics(model, val_dl, device)
         torch.cuda.empty_cache()
-        if epoch > 10 and sum_loss_val <= best_loss_val:
+        if epoch > epochs*0.5 and sum_loss_val <= best_loss_val:
             best_loss_val = sum_loss_val
-            torch.save(model.state_dict(), f'epoch:{epoch}_sum_loss_val:{sum_loss_val}.pt')
+            torch.save(model.state_dict(), f'epoch:{epoch}_sum_loss_val:{round(sum_loss_val,2)}.pt')
         print("last_lr  %.3f train_loss %.3f val_loss %.3f val_acc %.3f val_time %.3f" % (
         lr_, sum_loss / total, sum_loss_val, acc, val_time))
     return model, sum_loss / total
@@ -85,7 +85,6 @@ def get_predict(model, device, test_dl):
     name_arr = []
     pred_arr = []
     preds_arr = []
-    #test_dl.dataset.__len__())
     for x, name in test_dl:
         x = x.to(device)
         out_class = model(x)
@@ -95,5 +94,4 @@ def get_predict(model, device, test_dl):
         pred = list(map(lambda x: classes[x], pred))
         pred_arr = np.concatenate((pred_arr, pred), axis=0)
         preds_arr = np.concatenate((preds_arr, preds), axis=0)
-
-    return pd.DataFrame(data = np.array((name_arr, pred_arr, preds_arr)).T, columns=["name","class","output"])
+    return pd.DataFrame(data=np.array((name_arr, pred_arr, preds_arr)).T, columns=["name","class","output"])
