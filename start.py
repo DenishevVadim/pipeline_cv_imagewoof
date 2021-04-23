@@ -29,14 +29,24 @@ if args.mode == 'train':
     device = torch.device("cuda" if torch.cuda.is_available()
                           else "cpu")
     model = Net(3, 10)
+    model.to(device);
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.max_lr, weight_decay=args.weight_decay)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, args.max_lr, epochs=args.epochs,
                                                     steps_per_epoch=len(train_dl))
-    model.to(device);
 
     model, loss = fit_model(model, optimizer, scheduler, device, train_dl=train_dl, val_dl=val_dl, epochs=args.epochs,
                             grad_clip=args.grad_clip)
     print(loss)
     torch.save(model.state_dict(), 'model_dict')
     torch.save(model, 'model_zip')
+else:
+    custom_dataset = CustomDataset(args.folderpath, transform=get_val_transforms(), is_labeled = False)
+    test_dl = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=args.batchsize, shuffle=False)
+    device = torch.device("cuda" if torch.cuda.is_available()
+                          else "cpu")
+    model = Net(3, 10)
+    model.to(device);
+    names, preds = get_predict(model, device, test_dl)
+    #next(iter(test_dl))
+    #get_predict(model, device, test_dl)

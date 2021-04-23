@@ -57,11 +57,11 @@ def val_metrics(model, valid_dl, device):
         sum_loss += loss.item()
         total += batch
     val_time = (time.time() - start_time)
-    model.train()
     return sum_loss / total, acc / total, model, val_time
 
 
 def fit_model(model, optimizer, scheduler, device, train_dl, val_dl, epochs, grad_clip):
+    model.train()
     best_loss_val = 1
     for epoch in range(epochs):
         total, sum_loss, model, lr_ = train_metrics(model, optimizer, scheduler, train_dl, epoch, grad_clip, device)
@@ -74,3 +74,18 @@ def fit_model(model, optimizer, scheduler, device, train_dl, val_dl, epochs, gra
         print("last_lr  %.3f train_loss %.3f val_loss %.3f val_acc %.3f val_time %.3f" % (
         lr_, sum_loss / total, sum_loss_val, acc, val_time))
     return model, sum_loss / total
+
+
+def get_predict(model, device, test_dl):
+    name_arr = []
+    preds_arr = []
+    model.eval()
+    #test_dl.dataset.__len__())
+    for x, name in test_dl:
+        x = x.to(device)
+        out_class = model(x)
+        _, preds = torch.max(out_class, dim=1)
+    name_arr.append(name)
+    preds_arr.append(preds)
+    return name_arr, preds_arr
+

@@ -79,7 +79,7 @@ class CustomDataset(Dataset):
             image = cv2.imread(self.folder + '/' + self.image_list[idx])
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = self.transform(image=image)["image"]
-            return image
+            return image, self.image_list[idx]      # image, image name
 
 def get_dataset(filepath, transform, batch_size, shuffle = False, is_labeled = True):
     if not is_labeled:
