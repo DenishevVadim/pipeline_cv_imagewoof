@@ -20,7 +20,7 @@ import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 
 
-def train_metrics(model, optimizer, scheduler, train_dl, epoch, device, grad_clip=None):
+def train_metrics(model, optimizer, scheduler, device, train_dl, epoch, grad_clip=None):
     total = 0
     sum_loss = 0
     for x, y_class in train_dl:
@@ -65,7 +65,7 @@ def fit_model(model, optimizer, scheduler, device, train_dl, val_dl, epochs, gra
     model.train()
     best_loss_val = 1
     for epoch in range(epochs):
-        total, sum_loss, model, lr_ = train_metrics(model, optimizer, scheduler, train_dl, epoch, grad_clip, device)
+        total, sum_loss, model, lr_ = train_metrics(model, optimizer, scheduler, device, train_dl, epoch, grad_clip)
         torch.cuda.empty_cache()
         sum_loss_val, acc, model, val_time = val_metrics(model, val_dl, device)
         torch.cuda.empty_cache()

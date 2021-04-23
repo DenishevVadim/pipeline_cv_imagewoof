@@ -32,7 +32,7 @@ if args.mode == 'train':
     model.to(device);
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.maxlr, weight_decay=args.weightdecay)
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, args.max_lr, epochs=args.epochs,
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, args.maxlr, epochs=args.epochs,
                                                     steps_per_epoch=len(train_dl))
 
     model, loss = fit_model(model, optimizer, scheduler, device, train_dl=train_dl, val_dl=val_dl, epochs=args.epochs,
