@@ -61,7 +61,7 @@ def val_metrics(model, valid_dl, device):
     return sum_loss / total, acc / total, model, val_time
 
 
-def fit_model(model, optimizer, scheduler, train_dl, val_dl, epochs, grad_clip, device):
+def fit_model(model, optimizer, scheduler, device, train_dl, val_dl, epochs, grad_clip):
     best_loss_val = 1
     for epoch in range(epochs):
         total, sum_loss, model, lr_ = train_metrics(model, optimizer, scheduler, train_dl, epoch, grad_clip, device)
